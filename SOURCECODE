@@ -1,0 +1,49 @@
+# Install and load necessary libraries
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("ggcorrplot")
+
+library(ggplot2)
+library(dplyr)
+library(ggcorrplot)
+
+# Load the Titanic dataset
+titanic_data <- read.csv("path_to_your_dataset/train.csv")
+
+# Display the first few rows of the dataset
+head(titanic_data)
+
+# Check for missing values
+sapply(titanic_data, function(x) sum(is.na(x)))
+
+# Handle missing values
+# For example, fill missing values in the 'Age' column with the median
+titanic_data$Age[is.na(titanic_data$Age)] <- median(titanic_data$Age, na.rm = TRUE)
+
+# Drop unnecessary columns
+titanic_data <- titanic_data[, c("Survived", "Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked")]
+
+# Boxplot to visualize the distribution of Age by Survival
+ggplot(titanic_data, aes(x = factor(Survived), y = Age, fill = factor(Survived))) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Age by Survival")
+
+# Pair plot for numerical variables
+pairs(titanic_data[, c("Age", "SibSp", "Parch", "Fare")], 
+      main = "Pair Plot of Numerical Variables")
+
+# Correlation matrix heatmap
+correlation_matrix <- cor(titanic_data[, c("Survived", "Pclass", "Age", "SibSp", "Parch", "Fare")])
+ggcorrplot(correlation_matrix, hc.order = TRUE, 
+           type = "lower", lab = TRUE, 
+           title = "Correlation Matrix Heatmap")
+
+# Bar plot of survival by Embarked
+ggplot(titanic_data, aes(x = Embarked, fill = factor(Survived))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Survival Distribution by Embarked")
+
+# Bar plot of survival by SibSp
+ggplot(titanic_data, aes(x = factor(SibSp), fill = factor(Survived))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Survival Distribution by SibSp")
